@@ -1,0 +1,159 @@
+def setup_serial (self):
+
+self.ser = None
+
+self.serial_port = self.find_serial_device()
+
+self.fingerprint_id = None
+
+self.running = True
+
+self.camera_active = False
+
+def find_serial_device(self):
+
+ports
+
+serial.tools.list_ports.comports()
+
+for port in ports:
+
+if 'USB' in port.description or 'Serial' in port.description: return port.device
+
+return None
+
+import blockChain import os import json
+
+file_path = "blockChainDataBase.json"
+
+if not os.path.exists(file_path):
+
+else:
+
+b = blockChain.blockchain (gen=True)
+
+b.create_block()
+
+print (f" {file_path} has been created.")
+
+b = blockChain.blockchain()
+
+import blockChain import os
+
+import json
+
+def record_vote(self, candidate_idx):
+
+try:
+
+if not self.voting_active or not self.root.winfo_exists():
+
+return
+
+DuplicateCheck = 0
+
+data = b.show_blockchain()
+
+for dat in data:
+
+if dat["voter"] == self.fingerprint_id and
+
+dat["election_name"] == self.current_election ['election_name']:
+
+DuplicateCheck = 1
+
+if DuplicateCheck == 0:
+
+b.create_block(
+
+voter=self.fingerprint_id,
+
+candidate=self.current_election['candidates'][candidate_idx]['name'],
+
+election_name=self.current_election['election_name'],
+
+party=self.current_election['candidates'][candidate_idx]['party']
+
+)
+
+else:
+
+print('User already voted')
+
+except Exception as e:
+
+print (f"Vote recording error: {e}")
+
+finally:
+
+self.gui_queue.put(self.reset_interface)
+
+def show_results_interface(self): results_win = tk. Toplevel (self.root) results_win.title("Election Results") elections set()
+
+try:
+
+data = b.show_blockchain()
+
+for dat in data:
+
+elections.add(dat [ "election_name"])
+
+except FileNotFoundError:
+
+pass
+
+if not elections:
+
+ttk.Label (results_win, text="No elections found").pack (pady=20) return
+
+ttk.Label (results_win, text="Select Election: ").pack (pady=10)
+
+election_var = tk.StringVar()
+
+election_dropdown = ttk. Combobox (results_win, textvariable-election_var,
+
+election_dropdown.pack(pady=5)
+
+values=list(elections))
+
+ttk.Button(results_win, text="Show Results",
+
+command-lambda: self.display_results (election_var.get(),
+
+results_win)).pack(pady=10)
+
+from collections import defaultdict
+
+class Blockchain:
+
+def init(self):
+
+self.chain = []
+
+def show_blockchain(self):
+
+return self.chain
+
+def create_block (self, voter, candidate, election_name, party):
+
+block = {
+
+}
+
+"voter": voter,
+
+"candidate": candidate,
+
+"election_name": election_name,
+
+"party": party,
+
+"hash": self.generate_hash()
+
+self.chain.append(block) return block
+
+def generate_hash(self):
+
+return str(len(self.chain) + 1) # Simplified hash for demonstration purposes
+
+b = Blockchain()

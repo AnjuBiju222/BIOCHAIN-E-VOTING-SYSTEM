@@ -1,0 +1,15 @@
+def create_block (self, voter, candidate, election_name, party):
+
+block = {
+
+}
+
+"voter": voter,
+
+"candidate": candidate,
+
+"election_name": election_name,
+
+"party": party,
+
+"hash": self.generate_hash()

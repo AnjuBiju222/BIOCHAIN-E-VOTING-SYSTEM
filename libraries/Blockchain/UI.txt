@@ -1,0 +1,181 @@
+except Exception as e:
+
+print(f"GPIO error: {e}")
+
+finally:
+
+    # Cleanup GPIO resources
+
+    if 'lines' in locals():
+
+        lines.release()
+
+    if 'chip' in locals():
+
+        chip.close()
+
+
+
+def record_vote(self, candidate_idx):
+
+    try:
+
+        if not self.voting_active or not self.root.winfo_exists():
+
+            return
+
+        if 0 <= candidate_idx < len(self.candidate_frames):
+
+            frame = self.candidate_frames[candidate_idx]
+
+            if hasattr(frame, 'selection_indicator'):
+
+                frame.selection_indicator.config(foreground='green')
+
+                self.root.after(2000, 
+
+                    lambda f=frame: f.selection_indicator.config(foreground='gray') 
+
+                    if f.winfo_exists() else None
+
+                )
+
+        DuplicateCheck=0
+
+        data=b.show_blockchain()
+
+        for dat in data:
+
+            if dat["voter"]==self.fingerprint_id and dat["election_name"]==self.current_election['election_name']:
+
+                DuplicateCheck=1
+
+        if DuplicateCheck==0:
+
+            b.create_block(voter= self.fingerprint_id, candidate= self.current_election['candidates'][candidate_idx]['name'], election_name= self.current_election['election_name'] , party= self.current_election['candidates'][candidate_idx]['party'])
+
+        else:
+
+            print('user already voted')
+
+    except Exception as e:
+
+        print(f"Vote recording error: {e}")
+
+    finally:
+
+        self.gui_queue.put(self.reset_interface)
+
+
+
+def safe_reset_indicator(self, widget_path):
+
+    try:
+
+        widget = self.root.nametowidget(widget_path)
+
+        widget.config(foreground='gray')
+
+    except tk.TclError:
+
+        pass 
+
+    
+
+def reset_interface(self):
+
+    if not self.root.winfo_exists():
+
+        return
+
+    for after_id in self.root.tk.eval('after info').split():
+
+        self.root.after_cancel(after_id)
+
+    with self.thread_lock:
+
+        self.fingerprint_id = None
+
+        self.current_user = None
+
+        self.running = False
+
+        self.voting_active = False
+
+        self.camera_active = False
+
+        if hasattr(self, 'cap') and self.cap.isOpened():
+
+            self.cap.release()
+
+        if self.ser and self.ser.is_open:
+
+            self.ser.close()
+
+    self._safe_ui_reset()
+
+
+
+def _safe_ui_reset(self):
+
+    try:
+
+        if self.status_label.winfo_exists():
+
+            self.status_label.config(text="Place your thumb on the fingerprint sensor",foreground='black')
+
+        if self.result_label.winfo_exists():
+
+            self.result_label.config(text="")
+
+        if self.camera_label.winfo_exists():
+
+            self.camera_label.config(image='')     
+
+        self.clear_frame()
+
+        self.start_election_flow()
+
+    except tk.TclError as e:
+
+        print(f"UI reset error: {e}")
+
+
+
+def verify_stop_election(self):
+
+    pw = tk.simpledialog.askstring("Admin Verification", "Enter Admin Password:", show='*')
+
+    if pw == "password123":
+
+        self.stop_election()
+
+    else:
+
+        messagebox.showerror("Error", "Incorrect Password")
+
+
+
+def stop_election(self):
+
+    self.voting_active = False
+
+    self.show_admin_panel()
+
+
+
+def create_election_interface(self):
+
+    self.clear_frame()
+
+    self.current_frame = ttk.Frame(self.root)
+
+    self.current_frame.pack(expand=True, fill='both', padx=50, pady=50)
+
+    self.candidates = []
+
+    self.current_symbol = None
+
+    ttk.Label(self.current_frame, text="Create New Election", style='Title.TLabel').grid(row=0, column=0, columnspan=3, pady=20)
+
+    ttk.Label(self.current_frame, text="Election Name:").grid(row=1, column=0, sticky='w')

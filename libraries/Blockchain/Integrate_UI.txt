@@ -1,0 +1,139 @@
+self.election_name = ttk.Entry(self.current_frame, width=40)
+
+self.election_name.grid(row=1, column=1, columnspan=2, pady=5, sticky='ew')
+
+    ttk.Label(self.current_frame, text="Candidate Details", font=('Arial', 14)).grid(row=2, column=0, pady=10, sticky='w')
+
+    ttk.Label(self.current_frame, text="Name:").grid(row=3, column=0, sticky='w')
+
+    self.candidate_name = ttk.Entry(self.current_frame)
+
+    self.candidate_name.grid(row=3, column=1, pady=5, sticky='ew')
+
+    ttk.Label(self.current_frame, text="Party:").grid(row=4, column=0, sticky='w')
+
+    self.candidate_party = ttk.Entry(self.current_frame)
+
+    self.candidate_party.grid(row=4, column=1, pady=5, sticky='ew')
+
+    ttk.Label(self.current_frame, text="Symbol:").grid(row=5, column=0, sticky='w')
+
+    ttk.Button(self.current_frame, text="Upload Symbol",command=self.upload_symbol).grid(row=5, column=1, pady=5, sticky='w')
+
+    self.symbol_preview = ttk.Label(self.current_frame)
+
+    self.symbol_preview.grid(row=5, column=2, padx=10)
+
+    ttk.Button(self.current_frame, text="Add Candidate", style='Btn.TButton',command=self.add_candidate).grid(row=6, column=1, pady=10, sticky='w')
+
+    self.candidates_list = ttk.Treeview(self.current_frame, columns=('name', 'party'), show='headings')
+
+    self.candidates_list.heading('name', text='Name')
+
+    self.candidates_list.heading('party', text='Party')
+
+    self.candidates_list.grid(row=7, column=0, columnspan=3, pady=20, sticky='nsew')
+
+    ttk.Button(self.current_frame, text="Save Election", style='Btn.TButton',command=self.save_election).grid(row=8, column=1, pady=20)
+
+
+
+def upload_symbol(self):
+
+    file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png *.jpg *.jpeg")])
+
+    if file_path:
+
+        self.current_symbol = file_path
+
+        self.show_symbol_preview(file_path)
+
+
+
+def show_symbol_preview(self, path):
+
+    image = Image.open(path)
+
+    image.thumbnail((100, 100))
+
+    photo = ImageTk.PhotoImage(image)
+
+    self.symbol_preview.config(image=photo)
+
+    self.symbol_preview.image = photo
+
+
+
+def add_candidate(self):
+
+    name = self.candidate_name.get()
+
+    party = self.candidate_party.get()
+
+    symbol = self.current_symbol
+
+    if not all([name, party, symbol]):
+
+        messagebox.showerror("Error", "All fields are required!")
+
+        return 
+
+    if len(self.candidates) >= 20:
+
+        messagebox.showerror("Error", "Maximum 8 candidates allowed!")
+
+        return
+
+    os.makedirs('election_symbols', exist_ok=True)
+
+    symbol_filename = f"election_symbols/{name}_{party}.{symbol.split('.')[-1]}"
+
+    os.rename(symbol, symbol_filename)
+
+    self.candidates.append({'name': name,'party': party,'symbol': symbol_filename})
+
+    self.candidates_list.insert('', 'end', values=(name, party))
+
+    self.candidate_name.delete(0, 'end')
+
+    self.candidate_party.delete(0, 'end')
+
+    self.current_symbol = None
+
+    self.symbol_preview.config(image='')
+
+
+
+def save_election(self):
+
+    election_name = self.election_name.get()
+
+    if not election_name:
+
+        messagebox.showerror("Error", "Election name is required!")
+
+        return
+
+    if len(self.candidates) < 1:
+
+        messagebox.showerror("Error", "Add at least one candidate!")
+
+        return
+
+    election_data = {'election_name': election_name,'candidates': self.candidates}
+
+    with open('current_election.json', 'w') as f:
+
+        json.dump(election_data, f, indent=2)
+
+    messagebox.showinfo("Success", "Election saved successfully!")
+
+    self.show_admin_panel()
+
+    
+
+def del(self):
+
+    self.running = False
+
+    if self.ser and self.ser.is_open:
